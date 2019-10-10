@@ -8,7 +8,7 @@ export const useMapRef = () => {
   return [map, mapRef];
 };
 
-export const useMapApis = map => {
+export const useMapApis = (map: any) => {
   const [mapApis, setMapApis] = useState(null);
   useEffect(() => {
     if (map) {
@@ -20,9 +20,41 @@ export const useMapApis = map => {
   return mapApis;
 };
 
-export const useGetMap = () => {
-  const [mapNode, mapRef] = useMapRef();
+export const whenMapHasLoadedStyle = (map: any) => {
+  return new Promise(resolve => {
+    const isStyleLoaded = () => {
+      if (map.isStyleLoaded()) {
+        return resolve();
+      }
+      setTimeout(isStyleLoaded, 50);
+    };
+    isStyleLoaded();
+  });
+};
 
-  const mapApis = useMapApis(mapNode);
-  return { mapRef, mapApis };
+
+export const checkSourceLoaded = (map: any, sourceString: string) => {
+  if (
+    !map ||
+    !sourceString ||
+    !map.getStyle() ||
+    !map.getStyle().sources ||
+    !Object.keys(map.getStyle().sources).includes(sourceString)
+  ) {
+    return false;
+  }
+  return map.isSourceLoaded(sourceString);
+};
+
+
+export const whenMapHasLoadedSource = (map: any, sourceString: string) => {
+  return new Promise(resolve => {
+    const checkSourceInMap = () => {
+      if (checkSourceLoaded(map, sourceString)) {
+        return resolve();
+      }
+      setTimeout(checkSourceInMap, 50);
+    };
+    checkSourceInMap();
+  });
 };

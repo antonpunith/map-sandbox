@@ -2,14 +2,14 @@ import * as React from "react";
 import { useState, useEffect } from "react";
 import ReactMapGL from "react-map-gl";
 
-import { useMapRef, useMapApis } from "./functions";
+import { useMapRef, useMapApis, whenMapHasLoadedStyle, whenMapHasLoadedSource } from "./functions";
 
 const MAP_ACCESS_TOKEN =
   "pk.eyJ1IjoiamFtZXMtZW1zIiwiYSI6ImNqbDI3bDJhYzFuYnUza3F0eWNlZDAydjYifQ.RFbQDC7kOaW0NBLl9zD4FQ";
 const mapStyle = "mapbox://styles/james-ems/cjsvs7gth4k3s1fpm3y7qzevk";
 
 export const Map = () => {
-  const [viewport, setViewport] = useState({
+  const [viewport, setViewport] : any = useState({
     width: "100%",
     height: window.innerHeight,
     latitude: 40.777245,
@@ -22,35 +22,42 @@ export const Map = () => {
 
   useEffect(() => {
     if (mapApis) {
-      // add mapbox tile
-      mapApis.addSource("track_20190524", {
-        type: "vector",
-        url: "mapbox://ems-webapps.panynj_20190524"
-      });
-      setTimeout(() => {
-        mapApis.addLayer({
-          id: "tracks",
-          type: "line",
-          source: `track_20190524`,
-          "source-layer": `tracks_20190524`,
-          paint: {
-            "line-color": [
-              "case",
-              ["==", ["get", "operationType"], "Departure"],
-              "#8c54ff",
-              ["==", ["get", "operationType"], "Arrival"],
-              "#ea702e",
-              ["==", ["get", "operationType"], "Overflight"],
-              "#5aa700",
-              ["==", ["get", "operationType"], "TouchAndGo"],
-              "#5aaafa",
-              "hsl(0, 100%, 100%)"
-            ],
-            "line-opacity": 0.4,
-            "line-width": ["interpolate", ["linear"], ["zoom"], 8, 0.5, 12, 5]
-          }
+
+      whenMapHasLoadedStyle(mapApis).then(() => {
+        // add mapbox tile
+        // @ts-ignore
+        mapApis.addSource("track_20190524", {
+          type: "vector",
+          url: "mapbox://ems-webapps.panynj_20190524"
         });
-      }, 600);
+        whenMapHasLoadedSource(mapApis, "track_20190524").then(() =>{
+          // @ts-ignore
+          mapApis.addLayer({
+            id: "tracks",
+            type: "line",
+            source: `track_20190524`,
+            "source-layer": `tracks_20190524`,
+            paint: {
+              "line-color": [
+                "case",
+                ["==", ["get", "operationType"], "Departure"],
+                "#8c54ff",
+                ["==", ["get", "operationType"], "Arrival"],
+                "#ea702e",
+                ["==", ["get", "operationType"], "Overflight"],
+                "#5aa700",
+                ["==", ["get", "operationType"], "TouchAndGo"],
+                "#5aaafa",
+                "hsl(0, 100%, 100%)"
+              ],
+              "line-opacity": 0.4,
+              "line-width": ["interpolate", ["linear"], ["zoom"], 8, 0.5, 12, 5]
+            }
+          });
+        });
+      })
+
+
     }
   }, [mapApis]);
 

@@ -5,6 +5,7 @@
   "keywords": [],
   "main": "src/index.tsx",
   "dependencies": {
+    "@types/react-map-gl": "^5.0.2",
     "react": "16.8.4",
     "react-dom": "16.8.4",
     "react-map-gl": "5.0.12",
