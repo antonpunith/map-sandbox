@@ -1,11 +1,13 @@
 import { useEffect, useReducer } from "react";
 import { whenMapHasLoadedStyle, whenMapHasLoadedSource } from "./maps";
-import {mapboxStyleBackgroundNormalPaint, mapboxStyleTaggedPaint} from './styles'
+import {
+  mapboxStyleBackgroundNormalPaint,
+  mapboxStyleTaggedPaint
+} from "./styles";
 
-import {SOURCE_ID, SOURCE_LAYER} from './constants'
+import { SOURCE_ID, SOURCE_LAYER } from "./constants";
 
-
-export const loadTracks =(mapApis: any) => {
+export const loadTracks = (mapApis: any) => {
   whenMapHasLoadedStyle(mapApis).then(() => {
     // add mapbox tile
     // @ts-ignore
@@ -13,7 +15,7 @@ export const loadTracks =(mapApis: any) => {
       type: "vector",
       url: "mapbox://ems-webapps.panynj_20190524"
     });
-    whenMapHasLoadedSource(mapApis, SOURCE_ID).then(() =>{
+    whenMapHasLoadedSource(mapApis, SOURCE_ID).then(() => {
       // @ts-ignore
       mapApis.addLayer({
         id: "tracks",
@@ -31,19 +33,28 @@ export const loadTracks =(mapApis: any) => {
         paint: mapboxStyleTaggedPaint
       });
     });
-  })
-}
-
+  });
+};
 
 export const useMapTagSelection = (selectedOperation: any, mapApis: any) => {
-
   const tagsReducer = (state: any, action: any) => {
     if (state) {
-      mapApis.removeFeatureState({id: state.id, source: SOURCE_ID, sourceLayer: SOURCE_LAYER })
+      mapApis.removeFeatureState({
+        id: state.id,
+        source: SOURCE_ID,
+        sourceLayer: SOURCE_LAYER
+      });
     }
     switch (action.type) {
-      case 'set-tag':
-        mapApis.setFeatureState({id: selectedOperation.id, source: SOURCE_ID, sourceLayer: SOURCE_LAYER },{tagged: true})
+      case "set-tag":
+        mapApis.setFeatureState(
+          {
+            id: selectedOperation.id,
+            source: SOURCE_ID,
+            sourceLayer: SOURCE_LAYER
+          },
+          { tagged: true }
+        );
         return action.data.operation;
       default:
         return null;
@@ -51,21 +62,19 @@ export const useMapTagSelection = (selectedOperation: any, mapApis: any) => {
   };
 
   const [operationTagged, dispatchTagged] = useReducer(tagsReducer, null);
-  
-  useEffect(() => {
-    if(mapApis) {
-      if(selectedOperation && selectedOperation.properties) {
-        dispatchTagged({
-          type: 'set-tag',
-          data: { operation: selectedOperation },
-        });
-      }
-      else {
-        dispatchTagged({ type: 'unset-tag' });
-      }
-      
-    }
-  }, [selectedOperation, mapApis])
 
-  return (operationTagged);
-}
+  useEffect(() => {
+    if (mapApis) {
+      if (selectedOperation && selectedOperation.properties) {
+        dispatchTagged({
+          type: "set-tag",
+          data: { operation: selectedOperation }
+        });
+      } else {
+        dispatchTagged({ type: "unset-tag" });
+      }
+    }
+  }, [selectedOperation, mapApis]);
+
+  return operationTagged;
+};
