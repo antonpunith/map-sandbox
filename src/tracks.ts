@@ -33,19 +33,19 @@ export const loadTracks = (mapApis: any) => {
         });
 
         mapApis.addLayer({
-          id: `tagged_${date}`,
-          type: "line",
-          source: `${SOURCE_PREFIX}${date}`,
-          "source-layer": `${LAYER_PREFIX}${date}`,
-          paint: mapboxStyleTaggedPaint
-        });
-
-        mapApis.addLayer({
           id: `hovered_${date}`,
           type: "line",
           source: `${SOURCE_PREFIX}${date}`,
           "source-layer": `${LAYER_PREFIX}${date}`,
           paint: mapboxStyleHoverPaint
+        });
+
+        mapApis.addLayer({
+          id: `tagged_${date}`,
+          type: "line",
+          source: `${SOURCE_PREFIX}${date}`,
+          "source-layer": `${LAYER_PREFIX}${date}`,
+          paint: mapboxStyleTaggedPaint
         });
       });
     });
@@ -59,7 +59,7 @@ export const useMapTagSelection = (selectedOperation: any, mapApis: any) => {
         id: state.id,
         source: state.layer.source,
         sourceLayer: state.layer["source-layer"]
-      });
+      },'tagged');
     }
     switch (action.type) {
       case "set-tag":
@@ -102,7 +102,7 @@ export const useMapHover = (hoveredTracks: any, mapApis: any) => {
         id: state.id,
         source: state.layer.source,
         sourceLayer: state.layer["source-layer"]
-      });
+      }, 'hovered' );
     }
     switch (action.type) {
       case "set-hover":

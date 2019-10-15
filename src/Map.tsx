@@ -59,16 +59,23 @@ export const Map = () => {
       }
   };
   const handleHover = (e: any) => {
-    if (mapApis) {
-      // @ts-ignore
-      var features = mapApis.queryRenderedFeatures(
-        [
-          [e.point[0] , e.point[1] ],
-          [e.point[0] , e.point[1]]
-        ],
-        { layers: DATES.map(date => `operations_${date}`), filter:['any',['==', ['get', 'operationType'], 'Departure'], ['==', ['get', 'operationType'], 'Arrival']] }
-      );
-      setHoveredOperations(features);
+    if (viewport.zoom > 11 && mapApis) {
+      for (let distance = 0; distance <= 5; distance++) {
+        // @ts-ignore
+        const features = mapApis.queryRenderedFeatures(
+          [
+            [e.point[0] - distance, e.point[1] - distance],
+            [e.point[0] + distance, e.point[1] + distance]
+          ],
+          { layers: DATES.map(date => `operations_${date}`), filter:['any',['==', ['get', 'operationType'], 'Departure'], ['==', ['get', 'operationType'], 'Arrival']] }
+        );
+        setHoveredOperations(features);
+      }
+    }
+    else {
+      if(hoveredOperations.length){
+        setHoveredOperations([]);
+      }
     }
   }
 
@@ -104,3 +111,16 @@ export const Map = () => {
     </div>
   );
 };
+
+
+
+      // const distance = 5;
+      // // @ts-ignore
+      // var features = mapApis.queryRenderedFeatures(
+      //   [
+      //     [e.point[0] - distance, e.point[1] - distance],
+      //     [e.point[0] + distance, e.point[1] + distance]
+      //   ],
+      //   { layers: DATES.map(date => `operations_${date}`), filter:['any',['==', ['get', 'operationType'], 'Departure'], ['==', ['get', 'operationType'], 'Arrival']] }
+      // );
+      // setHoveredOperations(features);
