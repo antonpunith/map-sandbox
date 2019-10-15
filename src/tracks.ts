@@ -2,14 +2,14 @@ import { useEffect, useReducer } from "react";
 import { whenMapHasLoadedStyle, whenMapHasLoadedSource } from "./maps";
 import {
   mapboxStyleBackgroundNormalPaint,
-  mapboxStyleTaggedPaint
+  mapboxStyleTaggedPaint,
+  mapboxStyleHoverPaint
 } from "./styles";
 
-import { SOURCE_ID, SOURCE_LAYER, DATES, SOURCE_PREFIX, LAYER_PREFIX } from "./constants";
+import { DATES, SOURCE_PREFIX, LAYER_PREFIX } from "./constants";
 
 export const loadTracks = (mapApis: any) => {
   whenMapHasLoadedStyle(mapApis).then(() => {
-
     DATES.forEach(date => {
       mapApis.addSource(`${SOURCE_PREFIX}${date}`, {
         type: "vector",
@@ -17,8 +17,11 @@ export const loadTracks = (mapApis: any) => {
       });
     });
 
-    Promise.all(DATES.map((date) => whenMapHasLoadedSource(mapApis, `${SOURCE_PREFIX}${date}`))).then(() => {
-
+    Promise.all(
+      DATES.map(date =>
+        whenMapHasLoadedSource(mapApis, `${SOURCE_PREFIX}${date}`)
+      )
+    ).then(() => {
       DATES.forEach(date => {
         // @ts-ignore
         mapApis.addLayer({
@@ -36,7 +39,15 @@ export const loadTracks = (mapApis: any) => {
           "source-layer": `${LAYER_PREFIX}${date}`,
           paint: mapboxStyleTaggedPaint
         });
-      })
+
+        mapApis.addLayer({
+          id: `hovered_${date}`,
+          type: "line",
+          source: `${SOURCE_PREFIX}${date}`,
+          "source-layer": `${LAYER_PREFIX}${date}`,
+          paint: mapboxStyleHoverPaint
+        });
+      });
     });
   });
 };
@@ -47,7 +58,7 @@ export const useMapTagSelection = (selectedOperation: any, mapApis: any) => {
       mapApis.removeFeatureState({
         id: state.id,
         source: state.layer.source,
-        sourceLayer: state.layer['source-layer']
+        sourceLayer: state.layer["source-layer"]
       });
     }
     switch (action.type) {
@@ -56,7 +67,7 @@ export const useMapTagSelection = (selectedOperation: any, mapApis: any) => {
           {
             id: selectedOperation.id,
             source: selectedOperation.layer.source,
-            sourceLayer: selectedOperation.layer['source-layer']
+            sourceLayer: selectedOperation.layer["source-layer"]
           },
           { tagged: true }
         );
@@ -82,4 +93,41 @@ export const useMapTagSelection = (selectedOperation: any, mapApis: any) => {
   }, [selectedOperation, mapApis]);
 
   return operationTagged;
+};
+
+export const useMapHover = (hoveredTracks: any, mapApis: any) => {
+  const hoverReducer = (state: any, action: any) => {
+    if (state) {
+      mapApis.removeFeatureState({
+        id: state.id,
+        source: state.layer.source,
+        sourceLayer: state.layer["source-layer"]
+      });
+    }
+    switch (action.type) {
+      case "set-hover":
+        if (action.data.length) {
+          const feature = action.data[0];
+          mapApis.setFeatureState(
+            {
+              id: feature.id,
+              source: feature.layer.source,
+              sourceLayer: feature.layer["source-layer"]
+            },
+            { hovered: true }
+          );
+          return feature;
+        }
+        return null;
+      default:
+        return null;
+    }
+  };
+
+  const [tracksHovered, dispatchHover] = useReducer(hoverReducer, null);
+  useEffect(() => {
+    // TODO dispatch hover change
+    dispatchHover({ type: "set-hover", data: hoveredTracks });
+  }, [hoveredTracks]);
+  return { tracksHovered };
 };

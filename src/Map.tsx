@@ -5,7 +5,7 @@ import ReactMapGL, { Popup } from "react-map-gl";
 // map functions
 import { useMapRef, useMapApis } from "./maps";
 // tracks
-import { loadTracks, useMapTagSelection } from "./tracks";
+import { loadTracks, useMapTagSelection, useMapHover } from "./tracks";
 // constants
 import { MAP_ACCESS_TOKEN, MAP_STYLE, DATES} from "./constants";
 // component
@@ -30,44 +30,51 @@ export const Map = () => {
   }, [mapApis]);
 
   const [selectedOperation, setSelectedOperation]: any = useState(null);
+  const [hoveredOperations, setHoveredOperations]: any = useState([]);
 
   const handleClick = (e: any) => {
     const eventTime = new Date()
     console.log('map click',eventTime.getMilliseconds());
-    if (e.features && e.features.length && e.features[0].id) {
-      // there are feaures at the clicked location
-      const feature = e.features[0];
-      feature.latitude = e.lngLat[1];
-      feature.longitude = e.lngLat[0];
-      setSelectedOperation(feature);
-      const queriedTime = new Date()
-      console.log('clicked track', queriedTime.getMilliseconds());
-    } else {
+
       if (mapApis) {
-        for (let distance = 1; distance <= 10; distance++) {
+        for (let distance = 0; distance <= 10; distance++) {
           // @ts-ignore
-          var features = mapApis.queryRenderedFeatures(
+          const features = mapApis.queryRenderedFeatures(
             [
               [e.point[0] - distance, e.point[1] - distance],
               [e.point[0] + distance, e.point[1] + distance]
             ],
-            { layers: DATES.map(date => `operations_${date}`) }
+            { layers: DATES.map(date => `operations_${date}`), filter:['any',['==', ['get', 'operationType'], 'Departure'], ['==', ['get', 'operationType'], 'Arrival']] }
           );
+          const queriedTime = new Date()
+          console.log(distance, queriedTime.getMilliseconds());
           if (features.length && features[0].id) {
             const feature = features[0];
             feature.latitude = e.lngLat[1];
             feature.longitude = e.lngLat[0];
             setSelectedOperation(feature);
-            const queriedTime = new Date()
-            console.log(distance, queriedTime.getMilliseconds());
             break;
           }
         }
       }
-    }
   };
+  const handleHover = (e: any) => {
+    if (mapApis) {
+      // @ts-ignore
+      var features = mapApis.queryRenderedFeatures(
+        [
+          [e.point[0] , e.point[1] ],
+          [e.point[0] , e.point[1]]
+        ],
+        { layers: DATES.map(date => `operations_${date}`), filter:['any',['==', ['get', 'operationType'], 'Departure'], ['==', ['get', 'operationType'], 'Arrival']] }
+      );
+      setHoveredOperations(features);
+    }
+  }
 
   useMapTagSelection(selectedOperation, mapApis);
+
+  useMapHover(hoveredOperations, mapApis);
 
   return (
     <div className="react-map" onClick={() => { const time = new Date(); console.log('clicked', time.getMilliseconds())}}>
@@ -78,6 +85,8 @@ export const Map = () => {
         mapStyle={MAP_STYLE}
         ref={mapRef}
         onClick={handleClick}
+        onHover={handleHover}
+        doubleClickZoom={false}
       >
         {selectedOperation && (
           <Popup

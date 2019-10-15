@@ -32,3 +32,14 @@ export const mapboxStyleTaggedPaint = {
     'hsl(0, 100%, 100%)',
   ],
 };
+
+export const mapboxStyleHoverPaint = {
+  'line-opacity': ['case', ['boolean', ['feature-state', 'hovered'], false], 1, 0],
+  'line-width': ['case', ['boolean', ['feature-state', 'hovered'], false], 2, 0],
+  'line-color': [
+    'case',
+    ['boolean', ['feature-state', 'hovered'], false],
+    '#bada55',
+    'hsl(0, 100%, 100%)',
+  ],
+};
