@@ -5,33 +5,38 @@ import {
   mapboxStyleTaggedPaint
 } from "./styles";
 
-import { SOURCE_ID, SOURCE_LAYER } from "./constants";
+import { SOURCE_ID, SOURCE_LAYER, DATES, SOURCE_PREFIX, LAYER_PREFIX } from "./constants";
 
 export const loadTracks = (mapApis: any) => {
   whenMapHasLoadedStyle(mapApis).then(() => {
-    // add mapbox tile
-    // @ts-ignore
-    mapApis.addSource(SOURCE_ID, {
-      type: "vector",
-      url: "mapbox://ems-webapps.panynj_20190524"
-    });
-    whenMapHasLoadedSource(mapApis, SOURCE_ID).then(() => {
-      // @ts-ignore
-      mapApis.addLayer({
-        id: "tracks",
-        type: "line",
-        source: SOURCE_ID,
-        "source-layer": SOURCE_LAYER,
-        paint: mapboxStyleBackgroundNormalPaint
-      });
 
-      mapApis.addLayer({
-        id: "tagged",
-        type: "line",
-        source: SOURCE_ID,
-        "source-layer": SOURCE_LAYER,
-        paint: mapboxStyleTaggedPaint
+    DATES.forEach(date => {
+      mapApis.addSource(`${SOURCE_PREFIX}${date}`, {
+        type: "vector",
+        url: `mapbox://ems-webapps.panynj_${date}`
       });
+    });
+
+    Promise.all(DATES.map((date) => whenMapHasLoadedSource(mapApis, `${SOURCE_PREFIX}${date}`))).then(() => {
+
+      DATES.forEach(date => {
+        // @ts-ignore
+        mapApis.addLayer({
+          id: `operations_${date}`,
+          type: "line",
+          source: `${SOURCE_PREFIX}${date}`,
+          "source-layer": `${LAYER_PREFIX}${date}`,
+          paint: mapboxStyleBackgroundNormalPaint
+        });
+
+        mapApis.addLayer({
+          id: `tagged_${date}`,
+          type: "line",
+          source: `${SOURCE_PREFIX}${date}`,
+          "source-layer": `${LAYER_PREFIX}${date}`,
+          paint: mapboxStyleTaggedPaint
+        });
+      })
     });
   });
 };
@@ -41,8 +46,8 @@ export const useMapTagSelection = (selectedOperation: any, mapApis: any) => {
     if (state) {
       mapApis.removeFeatureState({
         id: state.id,
-        source: SOURCE_ID,
-        sourceLayer: SOURCE_LAYER
+        source: state.layer.source,
+        sourceLayer: state.layer['source-layer']
       });
     }
     switch (action.type) {
@@ -50,8 +55,8 @@ export const useMapTagSelection = (selectedOperation: any, mapApis: any) => {
         mapApis.setFeatureState(
           {
             id: selectedOperation.id,
-            source: SOURCE_ID,
-            sourceLayer: SOURCE_LAYER
+            source: selectedOperation.layer.source,
+            sourceLayer: selectedOperation.layer['source-layer']
           },
           { tagged: true }
         );

@@ -3,3 +3,7 @@ export const MAP_ACCESS_TOKEN =
 export const MAP_STYLE = "mapbox://styles/james-ems/cjsvs7gth4k3s1fpm3y7qzevk";
 export const SOURCE_ID = 'track_20190524';
 export const SOURCE_LAYER ='tracks_20190524';
+
+export const SOURCE_PREFIX = 'track_';
+export const LAYER_PREFIX = 'tracks_'
+export const DATES = ['20190524', '20190525']

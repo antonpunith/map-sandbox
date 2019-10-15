@@ -7,7 +7,7 @@ import { useMapRef, useMapApis } from "./maps";
 // tracks
 import { loadTracks, useMapTagSelection } from "./tracks";
 // constants
-import { MAP_ACCESS_TOKEN, MAP_STYLE } from "./constants";
+import { MAP_ACCESS_TOKEN, MAP_STYLE, DATES} from "./constants";
 // component
 import { OperationData } from "./OperationData";
 
@@ -32,12 +32,16 @@ export const Map = () => {
   const [selectedOperation, setSelectedOperation]: any = useState(null);
 
   const handleClick = (e: any) => {
+    const eventTime = new Date()
+    console.log('map click',eventTime.getMilliseconds());
     if (e.features && e.features.length && e.features[0].id) {
       // there are feaures at the clicked location
       const feature = e.features[0];
       feature.latitude = e.lngLat[1];
       feature.longitude = e.lngLat[0];
       setSelectedOperation(feature);
+      const queriedTime = new Date()
+      console.log('clicked track', queriedTime.getMilliseconds());
     } else {
       if (mapApis) {
         for (let distance = 1; distance <= 10; distance++) {
@@ -47,14 +51,15 @@ export const Map = () => {
               [e.point[0] - distance, e.point[1] - distance],
               [e.point[0] + distance, e.point[1] + distance]
             ],
-            { layers: ["tracks"] }
+            { layers: DATES.map(date => `operations_${date}`) }
           );
           if (features.length && features[0].id) {
             const feature = features[0];
             feature.latitude = e.lngLat[1];
             feature.longitude = e.lngLat[0];
             setSelectedOperation(feature);
-            console.log(distance);
+            const queriedTime = new Date()
+            console.log(distance, queriedTime.getMilliseconds());
             break;
           }
         }
@@ -65,7 +70,7 @@ export const Map = () => {
   useMapTagSelection(selectedOperation, mapApis);
 
   return (
-    <div className="react-map">
+    <div className="react-map" onClick={() => { const time = new Date(); console.log('clicked', time.getMilliseconds())}}>
       <ReactMapGL
         {...viewport}
         onViewportChange={viewport => setViewport(viewport)}
