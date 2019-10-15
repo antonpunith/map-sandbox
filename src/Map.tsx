@@ -32,7 +32,7 @@ export const Map = () => {
   }, [mapApis]);
 
   const [selectedOperation, setSelectedOperation]: any = useState(null);
-  const [hoveredOperations, setHoveredOperations]: any = useState([]);
+  const [hoveredOperation, setHoveredOperation]: any = useState([]);
 
   const handleClick = (e: any) => {
     const eventTime = new Date();
@@ -73,20 +73,27 @@ export const Map = () => {
           ],
           { layers: DATES.map(date => `operations_${date}`), filter:['any',['==', ['get', 'operationType'], 'Departure'], ['==', ['get', 'operationType'], 'Arrival']] }
         );
-        setHoveredOperations(features);
+        if (features.length) {
+          const feature = features[0];
+          feature.latitude = e.lngLat[1];
+          feature.longitude = e.lngLat[0];
+          setHoveredOperation(feature);
+        }
+
       }
 
     }
     else {
-      if(hoveredOperations.length){
-        setHoveredOperations([]);
+      // removing hovered when zoom is not set
+      if(hoveredOperation){
+        setHoveredOperation(null);
       }
     }
   }
 
   useMapTagSelection(selectedOperation, mapApis);
 
-  useMapHover(hoveredOperations, mapApis);
+  useMapHover(hoveredOperation, mapApis);
 
   return (
     <div className="react-map" onClick={() => { const time = new Date(); console.log('clicked', time.getMilliseconds())}}>
@@ -97,19 +104,19 @@ export const Map = () => {
         mapStyle={MAP_STYLE}
         ref={mapRef}
         onClick={handleClick}
-        onHover={debounce(handleHover, 100)}
+        onHover={debounce(handleHover, 300)}
         doubleClickZoom={false}
       >
-        {selectedOperation && (
+        {hoveredOperation && hoveredOperation.latitude && hoveredOperation.longitude && (
           <Popup
-            latitude={selectedOperation.latitude}
-            longitude={selectedOperation.longitude}
+            latitude={hoveredOperation.latitude}
+            longitude={hoveredOperation.longitude}
             closeButton={true}
             closeOnClick={false}
-            onClose={() => setSelectedOperation(null)}
+            onClose={() => setHoveredOperation(null)}
             tipSize={0}
           >
-            <OperationData selectedOperation={selectedOperation} />
+            <OperationData selectedOperation={hoveredOperation} />
           </Popup>
         )}
       </ReactMapGL>

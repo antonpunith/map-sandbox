@@ -95,39 +95,42 @@ export const useMapTagSelection = (selectedOperation: any, mapApis: any) => {
   return operationTagged;
 };
 
-export const useMapHover = (hoveredTracks: any, mapApis: any) => {
+export const useMapHover = (hoveredTrack: any, mapApis: any) => {
   const hoverReducer = (state: any, action: any) => {
-    if (state) {
-      mapApis.removeFeatureState({
-        id: state.id,
-        source: state.layer.source,
-        sourceLayer: state.layer["source-layer"]
-      }, 'hovered' );
+    if (mapApis) {
+      if (state) {
+        mapApis.removeFeatureState({
+          id: state.id,
+          source: state.layer.source,
+          sourceLayer: state.layer["source-layer"]
+        }, 'hovered');
+      }
+      switch (action.type) {
+        case "set-hover":
+          if (action.data) {
+            const feature = action.data;
+            mapApis.setFeatureState(
+              {
+                id: feature.id,
+                source: feature.layer.source,
+                sourceLayer: feature.layer["source-layer"]
+              },
+              { hovered: true }
+            );
+            return feature;
+          }
+          return null;
+        default:
+          return null;
+      }
     }
-    switch (action.type) {
-      case "set-hover":
-        if (action.data.length) {
-          const feature = action.data[0];
-          mapApis.setFeatureState(
-            {
-              id: feature.id,
-              source: feature.layer.source,
-              sourceLayer: feature.layer["source-layer"]
-            },
-            { hovered: true }
-          );
-          return feature;
-        }
-        return null;
-      default:
-        return null;
-    }
+ 
   };
 
   const [tracksHovered, dispatchHover] = useReducer(hoverReducer, null);
   useEffect(() => {
     // TODO dispatch hover change
-    dispatchHover({ type: "set-hover", data: hoveredTracks });
-  }, [hoveredTracks]);
+    dispatchHover({ type: "set-hover", data: hoveredTrack });
+  }, [hoveredTrack]);
   return { tracksHovered };
 };
