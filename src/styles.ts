@@ -12,7 +12,12 @@ export const mapboxStyleBackgroundNormalPaint = {
     '#5aaafa',
     'hsl(0, 100%, 100%)',
   ],
-  'line-opacity': 0.4,
+  'line-opacity': [
+    'case',
+    ['==', ['get', 'operationType'], 'Overflight'],
+    0,
+    0.4,
+  ],
   'line-width': ['interpolate', ['linear'], ['zoom'], 8, 0.5, 14, 1],
 };
 
