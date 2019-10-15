@@ -1,6 +1,7 @@
 import * as React from "react";
 import { useState, useEffect } from "react";
 import ReactMapGL, { Popup } from "react-map-gl";
+// import { debounce } from "debounce";
 
 // map functions
 import { useMapRef, useMapApis } from "./maps";
@@ -10,6 +11,7 @@ import { loadTracks, useMapTagSelection, useMapHover } from "./tracks";
 import { MAP_ACCESS_TOKEN, MAP_STYLE, DATES} from "./constants";
 // component
 import { OperationData } from "./OperationData";
+import { debounce } from "debounce";
 
 export const Map = () => {
   const [viewport, setViewport]: any = useState({
@@ -33,8 +35,10 @@ export const Map = () => {
   const [hoveredOperations, setHoveredOperations]: any = useState([]);
 
   const handleClick = (e: any) => {
-    const eventTime = new Date()
-    console.log('map click',eventTime.getMilliseconds());
+    const eventTime = new Date();
+    console.log('map click', eventTime.getMilliseconds());
+    
+    
 
       if (mapApis) {
         for (let distance = 0; distance <= 10; distance++) {
@@ -71,6 +75,7 @@ export const Map = () => {
         );
         setHoveredOperations(features);
       }
+
     }
     else {
       if(hoveredOperations.length){
@@ -92,7 +97,7 @@ export const Map = () => {
         mapStyle={MAP_STYLE}
         ref={mapRef}
         onClick={handleClick}
-        onHover={handleHover}
+        onHover={debounce(handleHover, 100)}
         doubleClickZoom={false}
       >
         {selectedOperation && (
