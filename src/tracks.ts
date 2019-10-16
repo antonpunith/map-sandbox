@@ -55,11 +55,14 @@ export const loadTracks = (mapApis: any) => {
 export const useMapTagSelection = (selectedOperation: any, mapApis: any) => {
   const tagsReducer = (state: any, action: any) => {
     if (state) {
-      mapApis.removeFeatureState({
-        id: state.id,
-        source: state.layer.source,
-        sourceLayer: state.layer["source-layer"]
-      },'tagged');
+      mapApis.removeFeatureState(
+        {
+          id: state.id,
+          source: state.layer.source,
+          sourceLayer: state.layer["source-layer"]
+        },
+        "tagged"
+      );
     }
     switch (action.type) {
       case "set-tag":
@@ -99,11 +102,14 @@ export const useMapHover = (hoveredTrack: any, mapApis: any) => {
   const hoverReducer = (state: any, action: any) => {
     if (mapApis) {
       if (state) {
-        mapApis.removeFeatureState({
-          id: state.id,
-          source: state.layer.source,
-          sourceLayer: state.layer["source-layer"]
-        }, 'hovered');
+        mapApis.removeFeatureState(
+          {
+            id: state.id,
+            source: state.layer.source,
+            sourceLayer: state.layer["source-layer"]
+          },
+          "hovered"
+        );
       }
       switch (action.type) {
         case "set-hover":
@@ -124,7 +130,6 @@ export const useMapHover = (hoveredTrack: any, mapApis: any) => {
           return null;
       }
     }
- 
   };
 
   const [tracksHovered, dispatchHover] = useReducer(hoverReducer, null);
