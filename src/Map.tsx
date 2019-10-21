@@ -6,7 +6,7 @@ import ReactMapGL, { Popup } from "react-map-gl";
 // map functions
 import { useMapRef, useMapApis } from "./maps";
 // tracks
-import { loadTracks, useMapTagSelection, useMapHover } from "./tracks";
+import { loadTracks, useMapTagSelection, useMapHover, useMapMultiSelect } from "./tracks";
 // constants
 import { MAP_ACCESS_TOKEN, MAP_STYLE, DATES } from "./constants";
 // component
@@ -111,76 +111,7 @@ export const Map = () => {
   useMapTagSelection(selectedOperation, mapApis);
   useMapHover(hoveredOperation, mapApis);
 
-
-
-  useEffect(() => {
-
-    let startPoint : any = null;
-    let endPoint : any = null;
-
-    if(mapApis && mapNode && mapNode._eventCanvasRef && mapNode._eventCanvasRef.current) {
-      const mapDiv = mapNode._eventCanvasRef.current;
-
-      // const mousePos = (e:any) => {
-      //   const rect  = mapDiv.getBoundingClientRect();
-      // }
-
-      const selectFeatures =(start : {x:number, y:number}, end: {x:number, y:number}) => {
-        if(mapApis && start && end) {
-          // @ts-ignore
-          const features = mapApis.queryRenderedFeatures(
-            [
-              [Math.min(start.x, end.x), Math.min(start.y, end.y)],
-              [Math.max(start.x, end.x), Math.max(start.y, end.y)]
-            ],
-            {
-              layers: DATES.map(date => `operations_${date}`),
-              filter: [
-                "any",
-                ["==", ["get", "operationType"], "Departure"],
-                ["==", ["get", "operationType"], "Arrival"]
-              ]
-            }
-          );
-          if(features.length) {
-            features.forEach((feature: any) => {
-              // @ts-ignore
-              mapApis.setFeatureState(
-                {
-                  id: feature.id,
-                  source: feature.layer.source,
-                  sourceLayer: feature.layer["source-layer"]
-                },
-                { tagged: true }
-              );
-            })
-          }
-        }
-      }
-
-      const finishSelect = (startPoint: any, endPoint: any) => {
-        if(startPoint && endPoint) {
-          selectFeatures(startPoint, endPoint);
-        }
-        
-        startPoint = null; endPoint = null;
-        mapDiv.removeEventListener('mouseup',onMouseUp)
-      }
-
-      const onMouseUp = (e: any) => {
-        endPoint = {x: e.clientX, y: e.clientY};
-        finishSelect(startPoint, endPoint)
-      }
-      const onMouseDown = (e: any) => {
-        if(e.shiftKey) {
-          startPoint = {x: e.clientX, y: e.clientY};
-          // TODO add event listeners 
-          mapDiv.addEventListener('mouseup',onMouseUp)
-        } 
-      }
-      mapDiv.addEventListener('mousedown',onMouseDown );
-    }
-  },[mapNode, mapApis])
+  useMapMultiSelect(mapNode, mapApis)
   
 
   return (
