@@ -36,8 +36,6 @@ export const Map = () => {
   const [hoveredOperation, setHoveredOperation]: any = useState(null);
 
   const handleClick = (e: any) => {
-    const eventTime = new Date();
-
     if (hoveredOperation) {
       setShowSelected(true);
       setSelectedOperation(hoveredOperation);
@@ -61,7 +59,6 @@ export const Map = () => {
             ]
           }
         );
-        const queriedTime = new Date();
         if (features.length && features[0].id) {
           const feature = features[0];
           feature.latitude = e.lngLat[1];
@@ -71,6 +68,7 @@ export const Map = () => {
           break;
         } else {
           setSelectedOperation(null);
+          setShowSelected(false);
         }
       }
     }
@@ -132,8 +130,8 @@ export const Map = () => {
             <Popup
               latitude={selectedOperation.latitude}
               longitude={selectedOperation.longitude}
-              closeButton={true}
-              closeOnClick={false}
+              closeButton={false}
+              closeOnClick={true}
               onClose={() => setShowSelected(false)}
               tipSize={0}
             >
@@ -148,7 +146,7 @@ export const Map = () => {
               latitude={hoveredOperation.latitude}
               longitude={hoveredOperation.longitude}
               closeButton={false}
-              closeOnClick={false}
+              closeOnClick={true}
               onClose={() => setHoveredOperation(null)}
               tipSize={0}
             >

@@ -32,7 +32,6 @@ export const whenMapHasLoadedStyle = (map: any) => {
   });
 };
 
-
 export const checkSourceLoaded = (map: any, sourceString: string) => {
   if (
     !map ||
@@ -45,7 +44,6 @@ export const checkSourceLoaded = (map: any, sourceString: string) => {
   }
   return map.isSourceLoaded(sourceString);
 };
-
 
 export const whenMapHasLoadedSource = (map: any, sourceString: string) => {
   return new Promise(resolve => {

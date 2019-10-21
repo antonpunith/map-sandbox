@@ -10,3 +10,60 @@ body {
 .react-map > div {
   cursor: crosshair !important;
 }
+
+.mapboxgl-popup .mapboxgl-popup-content {
+  background-color: #2e384d;
+  color: #f5f8fa;
+}
+
+.mapboxgl-popup .mapboxgl-popup-close-button {
+  color: #f5f8fa;
+}
+.mapboxgl-popup-anchor-left .mapboxgl-popup-tip {
+  border-right-color: #2e384d !important;
+}
+
+.mapboxgl-popup-anchor-right .mapboxgl-popup-tip {
+  border-left-color: #2e384d !important;
+}
+
+.mapboxgl-popup-anchor-top .mapboxgl-popup-tip,
+.mapboxgl-popup-anchor-top-right .mapboxgl-popup-tip,
+.mapboxgl-popup-anchor-top-left .mapboxgl-popup-tip {
+  border-bottom-color: #2e384d !important;
+}
+
+.mapboxgl-popup-anchor-bottom .mapboxgl-popup-tip,
+.mapboxgl-popup-anchor-bottom-right .mapboxgl-popup-tip,
+.mapboxgl-popup-anchor-bottom-left .mapboxgl-popup-tip {
+  border-top-color: #2e384d !important;
+}
+
+.ops-popup {
+  text-align: left;
+  min-width: 200px;
+}
+
+.ops-popup_title {
+  font-size: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 2px 0;
+}
+
+.ops-popup p {
+  font-size: 14px;
+  margin: 5px 0;
+}
+.ops-popup_time {
+  margin-bottom: 2px;
+}
+.ops-popup_label {
+  min-width: 4rem;
+  display: inline-block;
+}
+
+.ops-popup_value {
+  font-weight: 500;
+}
