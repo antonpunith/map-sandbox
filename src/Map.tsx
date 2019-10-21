@@ -111,6 +111,19 @@ export const Map = () => {
   useMapTagSelection(selectedOperation, mapApis);
   useMapHover(hoveredOperation, mapApis);
 
+  useEffect(() => {
+    if(mapNode && mapNode._eventCanvasRef && mapNode._eventCanvasRef.current) {
+      mapNode._eventCanvasRef.current.addEventListener('mousedown',(e:any)=>{
+        if(e.shiftKey) {
+          // TODO add event listeners 
+          console.log(e)
+        }
+        
+      } );
+    }
+  },[mapNode])
+  
+
   return (
     <div className="react-map">
       <ReactMapGL

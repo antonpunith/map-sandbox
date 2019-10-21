@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect } from "react";
 
 export const useMapRef = () => {
-  const [map, setMap] = useState(null);
+  const [map, setMap] : any = useState(null);
   const mapRef = useCallback(map => {
     setMap(map);
   }, []);
