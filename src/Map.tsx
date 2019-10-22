@@ -43,6 +43,7 @@ export const Map = () => {
       setSelectedOperation([hoveredOperation]);
       return;
     }
+    console.log(e.point);
 
     if (mapApis) {
       for (let distance = 0; distance <= 10; distance++) {
@@ -110,7 +111,7 @@ export const Map = () => {
     }
   };
 
-  useMapMultiSelect(mapNode, mapApis, setSelectedOperation, setSelectionBounds)
+  useMapMultiSelect(mapNode, mapApis, setSelectedOperation, setSelectionBounds, setShowSelected)
   
   useMapSelection(selectedOperations, mapApis);
   useMapHover(hoveredOperation, mapApis);

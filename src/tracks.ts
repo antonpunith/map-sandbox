@@ -152,18 +152,22 @@ export const useMapHover = (hoveredTrack: any, mapApis: any) => {
 };
 
 
-export const useMapMultiSelect = (mapNode: any, mapApis: any, setSelectedOperation: any, setSelectionBounds: any) => {
+export const useMapMultiSelect = (mapNode: any, mapApis: any, setSelectedOperation: any, setSelectionBounds: any, setShowSelected: any) => {
   
   useEffect(() => {
     let startPoint: any = null;
     let currentPoint: any = null;
     let endPoint: any = null;
 
+    
+
     if (mapApis && mapNode && mapNode._eventCanvasRef && mapNode._eventCanvasRef.current) {
+      
       const mapDiv = mapNode._eventCanvasRef.current;
 
       const selectFeatures = (start: { x: number, y: number }, end: { x: number, y: number }) => {
         if (mapApis && start && end) {
+          
           // @ts-ignore
           const features = mapApis.queryRenderedFeatures(
             [
@@ -179,7 +183,15 @@ export const useMapMultiSelect = (mapNode: any, mapApis: any, setSelectedOperati
               ]
             }
           );
-          setSelectedOperation(features)
+          if (features.length === 1) {
+            const latLnt = mapApis.unproject([(startPoint.x + endPoint.x)/2 , (startPoint.y + endPoint.y)/2]);
+            const selectedFeature = Object.assign(features[0],{latitude: latLnt.lat, longitude: latLnt.lng});
+            setSelectedOperation([selectedFeature])
+            setShowSelected(true);
+          } else {
+            setSelectedOperation(features)
+          }
+          
         }
       }
 
