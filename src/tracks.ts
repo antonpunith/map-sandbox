@@ -1,4 +1,4 @@
-import { useEffect, useReducer } from "react";
+import { useEffect, useReducer, useState } from "react";
 import { whenMapHasLoadedStyle, whenMapHasLoadedSource } from "./maps";
 import {
   mapboxStyleBackgroundNormalPaint,
@@ -152,9 +152,9 @@ export const useMapHover = (hoveredTrack: any, mapApis: any) => {
 };
 
 
-export const useMapMultiSelect = (mapNode: any, mapApis: any) => {
+export const useMapMultiSelect = (mapNode: any, mapApis: any, setSelectedOperation: any) => {
+  
   useEffect(() => {
-
     let startPoint: any = null;
     let endPoint: any = null;
 
@@ -178,19 +178,7 @@ export const useMapMultiSelect = (mapNode: any, mapApis: any) => {
               ]
             }
           );
-          if (features.length) {
-            features.forEach((feature: any) => {
-              // @ts-ignore
-              mapApis.setFeatureState(
-                {
-                  id: feature.id,
-                  source: feature.layer.source,
-                  sourceLayer: feature.layer["source-layer"]
-                },
-                { tagged: true }
-              );
-            })
-          }
+          setSelectedOperation(features)
         }
       }
 
@@ -217,4 +205,5 @@ export const useMapMultiSelect = (mapNode: any, mapApis: any) => {
       mapDiv.addEventListener('mousedown', onMouseDown);
     }
   }, [mapNode, mapApis])
+  
 }

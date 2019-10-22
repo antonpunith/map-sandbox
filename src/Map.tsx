@@ -108,10 +108,11 @@ export const Map = () => {
     }
   };
 
+  const selectedFeatures = useMapMultiSelect(mapNode, mapApis, setSelectedOperation)
+  
+
   useMapSelection(selectedOperations, mapApis);
   useMapHover(hoveredOperation, mapApis);
-
-  useMapMultiSelect(mapNode, mapApis)
 
   let selectedOperation : any = null;
   if(selectedOperations.length === 1) {
