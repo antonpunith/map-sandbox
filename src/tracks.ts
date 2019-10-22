@@ -52,8 +52,8 @@ export const loadTracks = (mapApis: any) => {
   });
 };
 
-export const useMapTagSelection = (selectedOperation: any, mapApis: any) => {
-  const tagsReducer = (state: any, action: any) => {
+export const useMapSelection = (selectedOperation: any, mapApis: any) => {
+  const selectionReducer = (state: any, action: any) => {
     if (state) {
       mapApis.removeFeatureState(
         {
@@ -65,7 +65,7 @@ export const useMapTagSelection = (selectedOperation: any, mapApis: any) => {
       );
     }
     switch (action.type) {
-      case "set-tag":
+      case "select":
         mapApis.setFeatureState(
           {
             id: selectedOperation.id,
@@ -80,22 +80,22 @@ export const useMapTagSelection = (selectedOperation: any, mapApis: any) => {
     }
   };
 
-  const [operationTagged, dispatchTagged] = useReducer(tagsReducer, null);
+  const [operationSelected, dispatchMapSelection] = useReducer(selectionReducer, null);
 
   useEffect(() => {
     if (mapApis) {
       if (selectedOperation && selectedOperation.properties) {
-        dispatchTagged({
-          type: "set-tag",
+        dispatchMapSelection({
+          type: "select",
           data: { operation: selectedOperation }
         });
       } else {
-        dispatchTagged({ type: "unset-tag" });
+        dispatchMapSelection({ type: "deselect" });
       }
     }
   }, [selectedOperation, mapApis]);
 
-  return operationTagged;
+  return operationSelected;
 };
 
 export const useMapHover = (hoveredTrack: any, mapApis: any) => {

@@ -6,7 +6,7 @@ import ReactMapGL, { Popup } from "react-map-gl";
 // map functions
 import { useMapRef, useMapApis } from "./maps";
 // tracks
-import { loadTracks, useMapTagSelection, useMapHover, useMapMultiSelect } from "./tracks";
+import { loadTracks, useMapSelection, useMapHover, useMapMultiSelect } from "./tracks";
 // constants
 import { MAP_ACCESS_TOKEN, MAP_STYLE, DATES } from "./constants";
 // component
@@ -108,7 +108,7 @@ export const Map = () => {
     }
   };
 
-  useMapTagSelection(selectedOperation, mapApis);
+  useMapSelection(selectedOperation, mapApis);
   useMapHover(hoveredOperation, mapApis);
 
   useMapMultiSelect(mapNode, mapApis)
