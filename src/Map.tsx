@@ -31,7 +31,7 @@ export const Map = () => {
     }
   }, [mapApis]);
 
-  const [selectedOperation, setSelectedOperation]: any = useState(null);
+  const [selectedOperations, setSelectedOperation]: any = useState([]);
   const [showSelected, setShowSelected] = useState(false);
   const [hoveredOperation, setHoveredOperation]: any = useState(null);
 
@@ -64,10 +64,10 @@ export const Map = () => {
           feature.latitude = e.lngLat[1];
           feature.longitude = e.lngLat[0];
           setShowSelected(true);
-          setSelectedOperation(feature);
+          setSelectedOperation([feature]);
           break;
         } else {
-          setSelectedOperation(null);
+          setSelectedOperation([]);
           setShowSelected(false);
         }
       }
@@ -108,11 +108,15 @@ export const Map = () => {
     }
   };
 
-  useMapSelection(selectedOperation, mapApis);
+  useMapSelection(selectedOperations, mapApis);
   useMapHover(hoveredOperation, mapApis);
 
   useMapMultiSelect(mapNode, mapApis)
-  
+
+  let selectedOperation : any = null;
+  if(selectedOperations.length === 1) {
+    selectedOperation = selectedOperations[0]
+  }
 
   return (
     <div className="react-map">

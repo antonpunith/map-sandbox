@@ -52,50 +52,61 @@ export const loadTracks = (mapApis: any) => {
   });
 };
 
-export const useMapSelection = (selectedOperation: any, mapApis: any) => {
+export const useMapSelection = (selectedOperations: any[], mapApis: any) => {
   const selectionReducer = (state: any, action: any) => {
-    if (state) {
-      mapApis.removeFeatureState(
-        {
-          id: state.id,
-          source: state.layer.source,
-          sourceLayer: state.layer["source-layer"]
-        },
-        "tagged"
-      );
+    if (state && state.length) {
+      state.forEach((operation: any) => {
+        mapApis.removeFeatureState(
+          {
+            id: operation.id,
+            source: operation.layer.source,
+            sourceLayer: operation.layer["source-layer"]
+          },
+          "tagged"
+        );
+      })
+
     }
     switch (action.type) {
       case "select":
-        mapApis.setFeatureState(
-          {
-            id: selectedOperation.id,
-            source: selectedOperation.layer.source,
-            sourceLayer: selectedOperation.layer["source-layer"]
-          },
-          { tagged: true }
-        );
-        return action.data.operation;
+        action.data.operations.forEach((selectedOperation: any) => {
+          mapApis.setFeatureState(
+            {
+              id: selectedOperation.id,
+              source: selectedOperation.layer.source,
+              sourceLayer: selectedOperation.layer["source-layer"]
+            },
+            { tagged: true }
+          );
+        })
+
+        return action.data.operations;
       default:
         return null;
     }
   };
 
-  const [operationSelected, dispatchMapSelection] = useReducer(selectionReducer, null);
+  const [operationsSelected, dispatchMapSelection] = useReducer(selectionReducer, null);
 
   useEffect(() => {
     if (mapApis) {
-      if (selectedOperation && selectedOperation.properties) {
-        dispatchMapSelection({
-          type: "select",
-          data: { operation: selectedOperation }
-        });
+      if(selectedOperations && selectedOperations.length) {
+        const filteredOperations = selectedOperations.filter((selectedOperation) => selectedOperation.properties);
+        if(filteredOperations.length) {
+          dispatchMapSelection({
+            type: "select",
+            data: { operations: selectedOperations }
+          });
+        } else {
+          dispatchMapSelection({ type: "deselect" });
+        }
       } else {
         dispatchMapSelection({ type: "deselect" });
       }
     }
-  }, [selectedOperation, mapApis]);
+  }, [selectedOperations, mapApis]);
 
-  return operationSelected;
+  return operationsSelected;
 };
 
 export const useMapHover = (hoveredTrack: any, mapApis: any) => {
