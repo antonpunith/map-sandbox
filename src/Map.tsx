@@ -11,6 +11,7 @@ import { loadTracks, useMapSelection, useMapHover, useMapMultiSelect } from "./t
 import { MAP_ACCESS_TOKEN, MAP_STYLE, DATES } from "./constants";
 // component
 import { OperationData } from "./OperationData";
+import { MapSelectionArea } from './MapSelectionArea';
 import { debounce } from "debounce";
 
 export const Map = () => {
@@ -32,13 +33,14 @@ export const Map = () => {
   }, [mapApis]);
 
   const [selectedOperations, setSelectedOperation]: any = useState([]);
+  const [selectionBounds, setSelectionBounds] : any = useState(null);
   const [showSelected, setShowSelected] = useState(false);
   const [hoveredOperation, setHoveredOperation]: any = useState(null);
 
   const handleClick = (e: any) => {
     if (hoveredOperation) {
       setShowSelected(true);
-      setSelectedOperation(hoveredOperation);
+      setSelectedOperation([hoveredOperation]);
       return;
     }
 
@@ -108,9 +110,8 @@ export const Map = () => {
     }
   };
 
-  const selectedFeatures = useMapMultiSelect(mapNode, mapApis, setSelectedOperation)
+  useMapMultiSelect(mapNode, mapApis, setSelectedOperation, setSelectionBounds)
   
-
   useMapSelection(selectedOperations, mapApis);
   useMapHover(hoveredOperation, mapApis);
 
@@ -162,6 +163,7 @@ export const Map = () => {
               <OperationData selectedOperation={hoveredOperation} />
             </Popup>
           )}
+          <MapSelectionArea selectionBounds={selectionBounds} />
       </ReactMapGL>
     </div>
   );

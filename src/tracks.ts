@@ -152,10 +152,11 @@ export const useMapHover = (hoveredTrack: any, mapApis: any) => {
 };
 
 
-export const useMapMultiSelect = (mapNode: any, mapApis: any, setSelectedOperation: any) => {
+export const useMapMultiSelect = (mapNode: any, mapApis: any, setSelectedOperation: any, setSelectionBounds: any) => {
   
   useEffect(() => {
     let startPoint: any = null;
+    let currentPoint: any = null;
     let endPoint: any = null;
 
     if (mapApis && mapNode && mapNode._eventCanvasRef && mapNode._eventCanvasRef.current) {
@@ -187,22 +188,34 @@ export const useMapMultiSelect = (mapNode: any, mapApis: any, setSelectedOperati
           selectFeatures(startPoint, endPoint);
         }
 
-        startPoint = null; endPoint = null;
+        startPoint = null;
+        currentPoint = null;
+        endPoint = null;
+        setSelectionBounds(null)
         mapDiv.removeEventListener('mouseup', onMouseUp)
+        mapDiv.removeEventListener('mousemove', onMouseMove)
       }
 
       const onMouseUp = (e: any) => {
         endPoint = { x: e.clientX, y: e.clientY };
         finishSelect(startPoint, endPoint)
       }
+
+      const onMouseMove =(e: any) => {
+        currentPoint = { x: e.clientX, y: e.clientY };
+        setSelectionBounds({startPoint,currentPoint })
+      }
+
       const onMouseDown = (e: any) => {
         if (e.shiftKey) {
           startPoint = { x: e.clientX, y: e.clientY };
-          // TODO add event listeners 
+          
           mapDiv.addEventListener('mouseup', onMouseUp)
+          mapDiv.addEventListener('mousemove', onMouseMove)
         }
       }
       mapDiv.addEventListener('mousedown', onMouseDown);
+      
     }
   }, [mapNode, mapApis])
   
